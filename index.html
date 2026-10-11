@@ -3,886 +3,1068 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A Story For You</title>
-  <!-- Tailwind CSS -->
+  <title>A Little Note For You 💜</title>
+  
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <!-- Canvas Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Quicksand', 'sans-serif'],
+          },
+          colors: {
+            lilac: {
+              25: '#fdfbff',
+              50: '#faf5fe',
+              100: '#f3e8fc',
+              200: '#e8d4f9',
+              300: '#d7bcf4',
+              400: '#be95ec',
+              500: '#a672e2',
+              600: '#8f52d5',
+              700: '#7539ba',
+              800: '#5c2a96',
+              900: '#431c70',
+            }
+          },
+          animation: {
+            'float-slow': 'float 8s ease-in-out infinite',
+            'pulse-soft': 'pulseSoft 5s ease-in-out infinite',
+            'shake': 'shake 0.4s ease-in-out',
+            'fade-up': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'pop-in': 'popIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-10px) rotate(1deg)' },
+            },
+            pulseSoft: {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '0.85', transform: 'scale(1.05)' },
+            },
+            shake: {
+              '0%, 100%': { transform: 'translateX(0)' },
+              '20%, 60%': { transform: 'translateX(-6px)' },
+              '40%, 80%': { transform: 'translateX(6px)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(14px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            popIn: {
+              '0%': { opacity: '0', transform: 'scale(0.88) translateY(18px)' },
+              '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #faf4f5;
-    }
-    .font-serif {
-      font-family: 'Playfair Display', serif;
-    }
-    .font-handwriting {
-      font-family: 'Caveat', cursive;
+      font-family: 'Quicksand', sans-serif;
+      background: radial-gradient(circle at 50% 12%, #fbf6ff 0%, #f2e5fc 45%, #e9d5fa 85%, #dfc3f7 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #4a2d6a;
     }
 
-    /* Floating background hearts animation */
-    @keyframes floatHeart {
-      0% {
-        transform: translateY(105vh) scale(0.6) rotate(0deg);
-        opacity: 0;
-      }
-      15% {
-        opacity: 0.65;
-      }
-      85% {
-        opacity: 0.65;
-      }
-      100% {
-        transform: translateY(-15vh) scale(1.15) rotate(45deg);
-        opacity: 0;
-      }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 
+        0 20px 45px -10px rgba(135, 90, 185, 0.18),
+        0 0 30px rgba(190, 149, 236, 0.15);
     }
 
-    .floating-heart {
-      position: fixed;
+    .orb {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(65px);
       pointer-events: none;
       z-index: 0;
-      animation: floatHeart linear infinite;
-      user-select: none;
-      filter: drop-shadow(0 2px 4px rgba(244, 63, 94, 0.15));
     }
 
-    /* Subtle pulse animation for decorative badge */
-    @keyframes gentlePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-    .gentle-pulse {
-      animation: gentlePulse 2.4s ease-in-out infinite;
+    .placard-active {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Crumpled paper texture & reveal animation */
-    .parchment {
-      background-color: #fdfbf7;
-      background-image: 
-        radial-gradient(#e2d5c8 0.75px, transparent 0.75px),
-        radial-gradient(#e2d5c8 0.75px, #fdfbf7 0.75px);
-      background-size: 26px 26px;
-      background-position: 0 0, 13px 13px;
-      box-shadow: 
-        0 4px 6px -1px rgba(0, 0, 0, 0.05),
-        0 20px 35px -10px rgba(225, 29, 72, 0.12),
-        inset 0 0 50px rgba(217, 119, 6, 0.06);
+    .placard-hidden {
+      opacity: 0;
+      transform: scale(0.96) translateY(20px);
+      pointer-events: none;
+      display: none;
     }
 
-    @keyframes unfoldPaper {
-      0% {
-        opacity: 0;
-        transform: scale(0.25) rotate(-10deg);
-        filter: blur(5px);
-      }
-      45% {
-        opacity: 0.9;
-        transform: scale(1.04) rotate(2.5deg);
-        filter: blur(0.5px);
-      }
-      75% {
-        transform: scale(0.98) rotate(-1deg);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-        filter: blur(0);
-      }
+    .scroll-container::-webkit-scrollbar {
+      width: 5px;
+    }
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: rgba(190, 149, 236, 0.45);
+      border-radius: 9999px;
     }
 
-    .animate-unfold {
-      animation: unfoldPaper 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      transform-origin: center center;
-    }
-
-    /* Photobooth Flash */
-    @keyframes cameraFlash {
-      0% { opacity: 0; }
-      50% { opacity: 0.95; }
-      100% { opacity: 0; }
-    }
-    .flash-active {
-      animation: cameraFlash 0.35s ease-out forwards;
-    }
-
-    /* Photobooth Filters */
-    .filter-haru {
-      filter: contrast(105%) brightness(108%) saturate(115%) sepia(8%);
-    }
-    .filter-amber {
-      filter: sepia(35%) contrast(110%) brightness(102%) saturate(125%);
-    }
-    .filter-rose {
-      filter: saturate(120%) brightness(105%) hue-rotate(-12deg);
-    }
-    .filter-noir {
-      filter: grayscale(100%) contrast(140%) brightness(95%);
+    .note-slide {
+      transition: opacity 0.35s ease, transform 0.35s ease;
     }
   </style>
 </head>
 
-<body class="text-stone-800 min-h-screen relative overflow-x-hidden selection:bg-rose-200 selection:text-rose-900 bg-gradient-to-b from-[#fff5f6] via-[#faf0f2] to-[#f7ebee]">
+<body class="relative flex flex-col justify-between items-center min-h-screen px-4 py-6 select-none">
 
-  <!-- FLOATING HEARTS CONTAINER (BEHIND CONTENT) -->
-  <div id="hearts-bg-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+  <!-- Ambient background glow elements -->
+  <div class="orb w-80 h-80 bg-lilac-300/40 -top-12 -left-12 animate-float-slow"></div>
+  <div class="orb w-96 h-96 bg-purple-200/50 bottom-2 -right-16 animate-float-slow" style="animation-delay: -4s;"></div>
+  <div class="orb w-64 h-64 bg-pink-200/35 top-1/2 left-1/4 animate-pulse-soft"></div>
 
-  <!-- AMBIENT GLOW BACKDROPS -->
-  <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-rose-200/40 blur-[120px] pointer-events-none z-0"></div>
-  <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-pink-300/30 blur-[130px] pointer-events-none z-0"></div>
+  <!-- Ambient floating symbols container -->
+  <div id="particle-field" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-  <!-- TOP BAR -->
-  <header class="sticky top-0 z-40 bg-white/75 backdrop-blur-md border-b border-rose-100/80 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-sm">
-    <div class="flex items-center gap-2">
-      <span class="text-xl gentle-pulse select-none">💖</span>
+  <!-- Header -->
+  <header class="relative z-10 w-full max-w-md mx-auto flex items-center justify-between pb-3">
+    <div class="w-10 h-10 rounded-full bg-white/80 border border-lilac-200 flex items-center justify-center shadow-sm text-base">
+      💌
     </div>
-    
-    <div class="flex items-center gap-3">
-      <!-- Photobooth Button -->
-      <button 
-        onclick="openPhotoboothModal()" 
-        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shadow-rose-200 active:scale-95"
-      >
-        <span>📸</span>
-        <span>Photobooth</span>
-      </button>
+
+    <div class="flex items-center space-x-2 bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-lilac-200 shadow-sm text-xs font-semibold text-lilac-800">
+      <span id="step-counter">Card 1 of 4</span>
+      <span class="inline-block w-2 h-2 rounded-full bg-lilac-500 animate-pulse"></span>
     </div>
   </header>
 
-  <!-- MAIN CONTENT CONTAINER -->
-  <main class="max-w-xl mx-auto px-4 pt-10 pb-28 relative z-10">
+  <!-- Main Card Container -->
+  <main class="relative z-10 w-full max-w-md mx-auto flex-1 flex flex-col justify-center items-center py-2">
+    <div class="relative w-full">
 
-    <!-- INTRO TEXT -->
-    <div class="text-center mb-10 px-2">
-      <p class="text-stone-600 text-sm sm:text-base leading-relaxed max-w-md mx-auto font-medium">
-        Each card below holds a secret piece. Solve each riddle to unfold the crumpled parchment notes and reveal where the path leads...
-      </p>
+      <!-- ============================================== -->
+      <!-- PLACARD 1                                      -->
+      <!-- ============================================== -->
+      <div id="placard-1" class="placard-active w-full glass-card rounded-3xl p-6 sm:p-7 flex flex-col shadow-xl max-h-[85vh] overflow-y-auto scroll-container">
+        
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs font-bold tracking-wider uppercase text-lilac-700 bg-lilac-100/80 px-3 py-1 rounded-full border border-lilac-200/70">
+            Placard 1
+          </span>
+          <span class="text-base">🧵</span>
+        </div>
+
+        <h2 class="text-xl sm:text-2xl font-bold text-lilac-900 mb-2 leading-snug">
+          What is the <span class="text-lilac-600 underline decoration-wavy decoration-lilac-400 decoration-1 underline-offset-4">____</span> string theory?
+        </h2>
+        
+        <p class="text-xs text-lilac-700/80 mb-5 font-medium">
+          Type the answer below to unlock the card.
+        </p>
+
+        <form id="form-card-1" onsubmit="handlePlacard1Submit(event)" class="w-full flex flex-col gap-3">
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              id="input-card-1"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Type your answer here..." 
+              class="w-full px-4 py-3 rounded-2xl bg-white/90 border border-lilac-200 text-lilac-900 placeholder-lilac-400/70 focus:outline-none focus:ring-2 focus:ring-lilac-400 focus:border-lilac-400 text-center font-semibold shadow-inner transition-all text-sm"
+            />
+          </div>
+
+          <div id="feedback-card-1" class="h-4 text-xs font-semibold text-rose-500 text-center opacity-0 transition-opacity"></div>
+
+          <button 
+            type="submit" 
+            id="btn-submit-1"
+            class="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-lilac-400 to-lilac-500 hover:from-lilac-500 hover:to-lilac-600 text-white font-semibold shadow-md transition-all duration-200 flex items-center justify-center gap-2 group active:scale-[0.98]">
+            <span>Submit</span>
+            <span class="transition-transform group-hover:translate-x-1">→</span>
+          </button>
+        </form>
+
+        <!-- Reveal Container (Card 1) -->
+        <div id="reveal-card-1" class="hidden flex-col items-center mt-3 pt-3 border-t border-lilac-200/70 animate-fade-up">
+          <p class="text-sm sm:text-base leading-relaxed text-lilac-900 font-medium text-center my-3 px-1">
+            <span class="font-bold text-lilac-800">Red string theory</span> &ndash; You dont notice each other until it's time. Then you'll notice and look back and realize all along you were connected by the red string. ❤️
+          </p>
+
+          <div class="w-full my-3 rounded-2xl overflow-hidden border border-lilac-200/80 shadow-md bg-white relative">
+            <img 
+              id="memory-image"
+              src="chat.png" 
+              alt="First chat memory" 
+              class="w-full h-auto object-cover rounded-2xl block"
+              onerror="showChatFallback()"
+            />
+
+            <!-- Fallback chat preview if chat.png isn't placed yet -->
+            <div id="chat-mockup-fallback" class="hidden w-full p-4 text-left font-sans text-xs bg-[#241334] text-white select-none">
+              <div class="text-center text-[10px] tracking-wider text-purple-300/60 font-medium mb-3">12 JUL 2025</div>
+              <div class="flex flex-col items-end mb-3 space-y-1">
+                <span class="text-[10px] text-purple-300/70">You replied to their story</span>
+                <span class="text-[10px] text-purple-400/50">Story unavailable</span>
+                <div class="bg-[#d8b4e2] text-[#200e30] py-2 px-3.5 rounded-2xl rounded-tr-sm max-w-[85%] text-xs font-normal shadow-sm">
+                  Haha The old film cameras do be good ngl
+                </div>
+              </div>
+              <div class="flex items-end gap-2 mt-2">
+                <div class="w-6 h-6 rounded-full bg-lilac-400/30 border border-lilac-300/40 flex items-center justify-center text-[10px] text-lilac-200 shrink-0">
+                  📷
+                </div>
+                <div class="bg-[#48286a] text-purple-100 py-2 px-3.5 rounded-2xl rounded-tl-sm max-w-[85%] text-xs font-normal shadow-sm border border-purple-400/20">
+                  Ikk and this one is like 25ish years old
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            onclick="navigateToCard(2)"
+            class="w-full mt-3 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-lilac-500 to-purple-600 hover:from-lilac-600 hover:to-purple-700 text-white font-semibold shadow-md transition-all flex items-center justify-center gap-2 group active:scale-[0.98]">
+            <span>Next Placard</span>
+            <span class="transition-transform group-hover:translate-x-1">→</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PLACARD 2                                      -->
+      <!-- ============================================== -->
+      <div id="placard-2" class="placard-hidden w-full glass-card rounded-3xl p-6 sm:p-7 flex flex-col shadow-xl max-h-[85vh] overflow-y-auto scroll-container">
+        
+        <div class="flex justify-between items-center mb-4">
+          <button 
+            type="button" 
+            onclick="navigateToCard(1)" 
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-lilac-700 hover:text-lilac-900 transition-colors py-1.5 px-3 rounded-full bg-lilac-100/90 hover:bg-lilac-200/90 border border-lilac-200">
+            <span>←</span>
+            <span>Back</span>
+          </button>
+
+          <span class="text-xs font-bold tracking-wider uppercase text-lilac-700 bg-lilac-100/80 px-3 py-1 rounded-full border border-lilac-200/70">
+            Placard 2
+          </span>
+        </div>
+
+        <h2 class="text-xl sm:text-2xl font-bold text-lilac-900 mb-2 leading-snug">
+          who's <span class="text-lilac-600 underline decoration-wavy decoration-lilac-400 decoration-1 underline-offset-4">______</span> rock?
+        </h2>
+        
+        <p class="text-xs text-lilac-700/80 mb-5 font-medium">
+          Type the answer below to unlock the card.
+        </p>
+
+        <form id="form-card-2" onsubmit="handlePlacard2Submit(event)" class="w-full flex flex-col gap-3">
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              id="input-card-2"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Type your answer here..." 
+              class="w-full px-4 py-3 rounded-2xl bg-white/90 border border-lilac-200 text-lilac-900 placeholder-lilac-400/70 focus:outline-none focus:ring-2 focus:ring-lilac-400 focus:border-lilac-400 text-center font-semibold shadow-inner transition-all text-sm"
+            />
+          </div>
+
+          <div id="feedback-card-2" class="h-4 text-xs font-semibold text-rose-500 text-center opacity-0 transition-opacity"></div>
+
+          <button 
+            type="submit" 
+            id="btn-submit-2"
+            class="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-lilac-400 to-lilac-500 hover:from-lilac-500 hover:to-lilac-600 text-white font-semibold shadow-md transition-all duration-200 flex items-center justify-center gap-2 group active:scale-[0.98]">
+            <span>Submit</span>
+            <span class="transition-transform group-hover:translate-x-1">→</span>
+          </button>
+        </form>
+
+        <!-- Reveal Container (Card 2) -->
+        <div id="reveal-card-2" class="hidden flex-col items-center mt-3 pt-3 border-t border-lilac-200/70 animate-fade-up">
+          
+          <div class="w-full my-3 rounded-2xl overflow-hidden border border-lilac-200/80 shadow-md bg-white relative">
+            <video 
+              id="placard2-video"
+              src="placard2.mp4" 
+              autoplay 
+              loop 
+              muted 
+              playsinline 
+              controls
+              class="w-full h-auto max-h-72 object-cover rounded-2xl block bg-lilac-900/10"
+              onerror="showVideoFallback()"
+            >
+              Your browser does not support the video tag.
+            </video>
+
+            <!-- Fallback if placard2.mp4 isn't placed yet -->
+            <div id="video-mockup-fallback" class="hidden w-full py-8 px-4 flex-col items-center justify-center text-center bg-gradient-to-b from-purple-100 to-lilac-100">
+              <span class="text-4xl mb-2 animate-bounce">🎬</span>
+              <p class="text-xs font-semibold text-lilac-800">Lovers Rock Video</p>
+              <p class="text-[11px] text-lilac-600/80 mt-1">Upload placard2.mp4 to your repo to play here</p>
+            </div>
+          </div>
+
+          <p class="text-sm sm:text-base leading-relaxed text-lilac-900 font-medium text-center my-3 px-1">
+            you always say you should sleep or its late - but all i think is your voice through the phone sounds like music in the early morning I hear the birds chirping the blue night turning orange and i think how lucky i am to loose sleep over this
+          </p>
+
+          <button 
+            type="button" 
+            onclick="navigateToCard(3)"
+            class="w-full mt-3 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-lilac-500 to-purple-600 hover:from-lilac-600 hover:to-purple-700 text-white font-semibold shadow-md transition-all flex items-center justify-center gap-2 group active:scale-[0.98]">
+            <span>Next Placard</span>
+            <span class="transition-transform group-hover:translate-x-1">→</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PLACARD 3                                      -->
+      <!-- ============================================== -->
+      <div id="placard-3" class="placard-hidden w-full glass-card rounded-3xl p-6 sm:p-7 flex flex-col shadow-xl max-h-[85vh] overflow-y-auto scroll-container">
+        
+        <div class="flex justify-between items-center mb-4">
+          <button 
+            type="button" 
+            onclick="navigateToCard(2)" 
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-lilac-700 hover:text-lilac-900 transition-colors py-1.5 px-3 rounded-full bg-lilac-100/90 hover:bg-lilac-200/90 border border-lilac-200">
+            <span>←</span>
+            <span>Back</span>
+          </button>
+
+          <span class="text-xs font-bold tracking-wider uppercase text-lilac-700 bg-lilac-100/80 px-3 py-1 rounded-full border border-lilac-200/70">
+            Placard 3
+          </span>
+        </div>
+
+        <h2 class="text-xl sm:text-2xl font-bold text-lilac-900 mb-2 leading-snug">
+          What is something a butterfly can never see, but everyone else admires? 🦋
+        </h2>
+        
+        <p class="text-xs text-lilac-700/80 mb-5 font-medium">
+          Type the answer below to unlock the card.
+        </p>
+
+        <form id="form-card-3" onsubmit="handlePlacard3Submit(event)" class="w-full flex flex-col gap-3">
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              id="input-card-3"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Type your answer here..." 
+              class="w-full px-4 py-3 rounded-2xl bg-white/90 border border-lilac-200 text-lilac-900 placeholder-lilac-400/70 focus:outline-none focus:ring-2 focus:ring-lilac-400 focus:border-lilac-400 text-center font-semibold shadow-inner transition-all text-sm"
+            />
+          </div>
+
+          <div id="feedback-card-3" class="h-4 text-xs font-semibold text-rose-500 text-center opacity-0 transition-opacity"></div>
+
+          <button 
+            type="submit" 
+            id="btn-submit-3"
+            class="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-lilac-400 to-lilac-500 hover:from-lilac-500 hover:to-lilac-600 text-white font-semibold shadow-md transition-all duration-200 flex items-center justify-center gap-2 group active:scale-[0.98]">
+            <span>Submit</span>
+            <span class="transition-transform group-hover:translate-x-1">→</span>
+          </button>
+        </form>
+
+        <!-- Reveal Container (Card 3 - Interactive Click-after-Click Notes) -->
+        <div id="reveal-card-3" class="hidden flex-col items-center mt-3 pt-3 border-t border-lilac-200/70 animate-fade-up">
+          
+          <div class="w-full bg-white/80 rounded-2xl p-5 border border-lilac-200 shadow-sm min-h-[190px] flex flex-col justify-between relative overflow-hidden mt-2">
+            
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-lilac-100 text-xs font-semibold text-lilac-600">
+              <span id="note-tracker">Note 1 of 5</span>
+              <span class="text-sm">✨</span>
+            </div>
+
+            <div id="notes-content" class="note-slide py-2 text-center text-sm sm:text-base text-lilac-900 font-medium leading-relaxed">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div id="note5-photo-container" class="hidden w-full my-3 rounded-2xl overflow-hidden border border-lilac-200 shadow-md bg-white relative">
+              <img 
+                id="photo-card-3" 
+                src="placard3.jpg" 
+                alt="Us together" 
+                class="w-full h-auto max-h-72 object-cover rounded-2xl block" 
+                onerror="showPhotoFallback()"
+              />
+
+              <div id="photo-mockup-fallback" class="hidden w-full py-8 px-4 flex-col items-center justify-center text-center bg-gradient-to-b from-purple-100 to-lilac-100">
+                <span class="text-4xl mb-2">📸</span>
+                <p class="text-xs font-semibold text-lilac-800">Our Photo</p>
+                <p class="text-[11px] text-lilac-600/80 mt-1">Upload placard3.jpg to your repo to display here</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 mt-2 border-t border-lilac-100">
+              <button 
+                type="button" 
+                id="btn-note-prev"
+                onclick="prevNote()" 
+                class="text-xs font-semibold text-lilac-600 hover:text-lilac-900 px-3 py-1.5 rounded-full bg-lilac-50 border border-lilac-200/60 opacity-40 cursor-not-allowed">
+                ← Prev
+              </button>
+
+              <button 
+                type="button" 
+                id="btn-note-next"
+                onclick="nextNote()" 
+                class="text-xs font-semibold text-lilac-800 hover:text-lilac-950 px-4 py-1.5 rounded-full bg-lilac-200/80 hover:bg-lilac-300/80 border border-lilac-300 transition-all shadow-sm">
+                Next note 💌
+              </button>
+            </div>
+
+          </div>
+
+          <button 
+            type="button" 
+            id="btn-finish-card-3"
+            onclick="navigateToCard(4)"
+            class="w-full mt-4 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-lilac-500 to-purple-600 hover:from-lilac-600 hover:to-purple-700 text-white font-semibold shadow-md transition-all flex items-center justify-center gap-2 group active:scale-[0.98]">
+            <span>Next Placard</span>
+            <span class="transition-transform group-hover:translate-x-1">→</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PLACARD 4 (Statement & Video Proposal Reveal)  -->
+      <!-- ============================================== -->
+      <div id="placard-4" class="placard-hidden w-full glass-card rounded-3xl p-6 sm:p-7 flex flex-col shadow-xl max-h-[85vh] overflow-y-auto scroll-container">
+        
+        <div class="flex justify-between items-center mb-4">
+          <button 
+            type="button" 
+            onclick="navigateToCard(3)" 
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-lilac-700 hover:text-lilac-900 transition-colors py-1.5 px-3 rounded-full bg-lilac-100/90 hover:bg-lilac-200/90 border border-lilac-200">
+            <span>←</span>
+            <span>Back</span>
+          </button>
+
+          <span class="text-xs font-bold tracking-wider uppercase text-lilac-700 bg-lilac-100/80 px-3 py-1 rounded-full border border-lilac-200/70">
+            Placard 4
+          </span>
+        </div>
+
+        <!-- Initial Statement State -->
+        <div id="placard-4-statement-view" class="flex flex-col items-center text-center my-auto py-2">
+          
+          <div class="w-14 h-14 rounded-2xl bg-lilac-100/80 border border-lilac-200 flex items-center justify-center text-2xl shadow-inner mb-4">
+            💭
+          </div>
+
+          <div class="bg-white/70 border border-lilac-200/90 rounded-2xl p-5 sm:p-6 shadow-sm my-2 w-full">
+            <p class="text-sm sm:text-base leading-relaxed text-lilac-900 font-medium whitespace-pre-line text-center">
+worse part of doing all this is I can't hug you
+I cant see you eye to eye
+I cant feel you
+I cant kiss you by the end of this note :///
+            </p>
+          </div>
+
+          <button 
+            type="button" 
+            onclick="revealProposalVideo()"
+            class="w-full mt-6 py-4 px-6 rounded-2xl bg-gradient-to-r from-lilac-500 via-purple-600 to-lilac-600 hover:from-lilac-600 hover:to-purple-700 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 group active:scale-[0.98]">
+            <span>Reveal</span>
+            <span class="text-lg transition-transform group-hover:scale-125">💌</span>
+          </button>
+        </div>
+
+        <!-- Revealed State: Proposal Video Player & Timed Question -->
+        <div id="placard-4-video-view" class="hidden flex-col items-center w-full animate-fade-up">
+          
+          <div class="w-full my-2 rounded-2xl overflow-hidden border border-lilac-200/90 shadow-md bg-white relative">
+            <video 
+              id="proposal-video"
+              src="proposal.mp4" 
+              playsinline 
+              controls
+              class="w-full h-auto max-h-72 object-cover rounded-2xl block bg-lilac-950/10"
+              onerror="showProposalVideoFallback()"
+            >
+              Your browser does not support the video tag.
+            </video>
+
+            <!-- Fallback if proposal.mp4 isn't added yet -->
+            <div id="proposal-video-mockup-fallback" class="hidden w-full py-10 px-4 flex-col items-center justify-center text-center bg-gradient-to-b from-purple-100 to-lilac-100">
+              <span class="text-4xl mb-2 animate-pulse">🎥</span>
+              <p class="text-xs font-semibold text-lilac-800">Proposal Video</p>
+              <p class="text-[11px] text-lilac-600/80 mt-1">Upload proposal.mp4 to your repo to play with sound</p>
+            </div>
+          </div>
+
+          <!-- Audio notice / unmute helper -->
+          <div id="unmute-banner" class="hidden items-center justify-between w-full px-3.5 py-2 my-2 bg-lilac-100/90 border border-lilac-200 rounded-xl text-xs text-lilac-800">
+            <span>🔊 Click to play with sound</span>
+            <button type="button" onclick="ensureProposalAudio()" class="px-2.5 py-1 bg-white font-semibold rounded-lg shadow-xs hover:bg-lilac-50 border border-lilac-200">
+              Unmute 🎵
+            </button>
+          </div>
+
+          <!-- Video Progress Indicator (discreet until 40 seconds) -->
+          <div id="countdown-hint" class="text-[11px] font-medium text-lilac-600/80 my-1 tracking-wide">
+            Watching together... 💜
+          </div>
+
+          <!-- BIG QUESTION: Appears automatically when video reaches 40 seconds -->
+          <div id="proposal-question-box" class="hidden flex-col items-center text-center w-full mt-4 pt-4 border-t border-lilac-200 animate-pop-in">
+            
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100/90 border border-pink-200 text-pink-700 text-xs font-bold mb-2">
+              <span>💍</span>
+              <span>One question left</span>
+            </div>
+
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-lilac-950 tracking-tight my-2">
+              Will you be my girlfriend?
+            </h3>
+            
+            <p class="text-xs text-lilac-700 font-medium mb-5">
+              from the bottom of my heart 🌸
+            </p>
+
+            <div class="w-full flex flex-col sm:flex-row gap-3">
+              <button 
+                type="button" 
+                onclick="handleSheSaidYes()"
+                class="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-pink-400 via-lilac-500 to-purple-600 hover:from-pink-500 hover:to-purple-700 text-white font-bold text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                <span>Yes, forever! 🥺💖</span>
+              </button>
+
+              <button 
+                type="button" 
+                onclick="handleSheSaidYes()"
+                class="flex-1 py-3.5 px-4 rounded-2xl bg-white/90 hover:bg-lilac-100/80 border border-lilac-300 text-lilac-900 font-bold text-sm shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+                <span>Yes (obviously) ✨</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
-
-    <!-- PLACARDS VERTICAL FEED -->
-    <div id="placards-container" class="space-y-10">
-      <!-- Dynamically Rendered by JS -->
-    </div>
-
   </main>
 
-  <!-- FOOTER -->
-  <footer class="text-center py-8 text-xs text-stone-400 border-t border-rose-100/60 relative z-10">
-    <p>Crafted with love <span id="admin-secret-heart" class="cursor-pointer select-none text-rose-400 hover:scale-125 inline-block transition">❤️</span></p>
-  </footer>
+  <footer class="relative z-10 w-full max-w-md text-center py-2 min-h-[16px]"></footer>
 
-  <!-- ================= PHOTOBOOTH MODAL ================= -->
-  <div id="photobooth-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-    <div class="bg-white rounded-3xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl relative border border-rose-100 my-auto">
-      
-      <!-- Close Button -->
+  <!-- ============================================== -->
+  <!-- SWEET CELEBRATION MODAL ON "YES"               -->
+  <!-- ============================================== -->
+  <div id="yes-modal" class="fixed inset-0 z-50 hidden items-center justify-center px-4 bg-purple-950/40 backdrop-blur-sm">
+    <div class="glass-card rounded-3xl p-7 max-w-sm w-full text-center shadow-2xl border border-white flex flex-col items-center animate-pop-in">
+      <div class="w-16 h-16 rounded-full bg-lilac-100 flex items-center justify-center text-3xl mb-3 shadow-inner">
+        💍✨
+      </div>
+      <h4 class="text-2xl font-bold text-lilac-900 mb-2">You made my day!</h4>
+      <p class="text-xs sm:text-sm text-lilac-700 leading-relaxed font-medium mb-6">
+        Connected by the red string all along. I can't wait for all our memories ahead. 💜
+      </p>
       <button 
-        onclick="closePhotoboothModal()"
-        class="absolute top-4 right-4 w-9 h-9 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center transition"
-      >
-        ✕
+        type="button" 
+        onclick="closeYesModal()"
+        class="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-lilac-500 to-purple-600 text-white font-semibold text-xs shadow-md">
+        Back to our video 🌸
       </button>
-
-      <!-- Photobooth Header -->
-      <div class="text-center mb-6">
-        <h2 class="font-serif text-2xl font-bold text-stone-800">Classic 4-Shot Photobooth 📸</h2>
-        <p class="text-xs text-stone-500 mt-1">Capture four memories together & save your vintage photo strip</p>
-      </div>
-
-      <!-- Studio Layout -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-        
-        <!-- Live Camera & Controls -->
-        <div class="md:col-span-7 flex flex-col items-center">
-          <div class="relative w-full aspect-[4/3] bg-stone-900 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center border-2 border-stone-800">
-            
-            <!-- Video Preview -->
-            <video id="webcam-video" autoplay playsinline muted class="w-full h-full object-cover filter-haru -scale-x-100"></video>
-            
-            <!-- Shutter Flash Overlay -->
-            <div id="camera-flash" class="absolute inset-0 bg-white opacity-0 pointer-events-none"></div>
-
-            <!-- Countdown Overlay -->
-            <div id="countdown-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white font-serif text-7xl font-bold hidden pointer-events-none backdrop-blur-[2px]">
-              3
-            </div>
-
-            <!-- Slot Indicator Badge -->
-            <div id="current-slot-badge" class="absolute top-3 left-3 bg-black/60 text-white text-[11px] px-2.5 py-1 rounded-full backdrop-blur-md">
-              Ready to shoot ✨
-            </div>
-          </div>
-
-          <!-- Filter Selection -->
-          <div class="w-full mt-4 flex items-center justify-between gap-2 overflow-x-auto py-1">
-            <button onclick="setPhotoboothFilter('filter-haru')" class="filter-btn text-xs px-3 py-1.5 rounded-full border border-stone-200 hover:border-rose-400 transition active:scale-95 bg-rose-50 font-medium text-rose-700">🌸 90s Film</button>
-            <button onclick="setPhotoboothFilter('filter-amber')" class="filter-btn text-xs px-3 py-1.5 rounded-full border border-stone-200 hover:border-rose-400 transition active:scale-95 text-stone-600">🎞️ Amber</button>
-            <button onclick="setPhotoboothFilter('filter-rose')" class="filter-btn text-xs px-3 py-1.5 rounded-full border border-stone-200 hover:border-rose-400 transition active:scale-95 text-stone-600">💖 Rose</button>
-            <button onclick="setPhotoboothFilter('filter-noir')" class="filter-btn text-xs px-3 py-1.5 rounded-full border border-stone-200 hover:border-rose-400 transition active:scale-95 text-stone-600">🖤 Noir</button>
-          </div>
-
-          <!-- Camera Buttons -->
-          <div class="mt-4 flex flex-wrap gap-2 w-full justify-center">
-            <button 
-              id="start-sequence-btn"
-              onclick="startPhotoboothSequence()" 
-              class="flex-1 min-w-[160px] py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold shadow-md shadow-rose-200 transition active:scale-95"
-            >
-              Take 4-Shot Sequence ✨
-            </button>
-            <button 
-              onclick="retakeCurrentSlot()" 
-              class="px-4 py-2.5 rounded-xl border border-stone-300 hover:bg-stone-50 text-stone-700 text-sm font-medium transition"
-            >
-              Retake Slot
-            </button>
-          </div>
-        </div>
-
-        <!-- Film Strip Preview -->
-        <div class="md:col-span-5 flex flex-col items-center">
-          <div id="photobooth-strip" class="w-48 bg-white p-3 shadow-xl rounded-sm border border-stone-200 flex flex-col gap-2 transition-colors">
-            <div onclick="selectSlot(0)" class="w-full aspect-[4/3] bg-stone-100 rounded-sm overflow-hidden relative cursor-pointer border border-stone-200/50">
-              <img id="strip-img-0" class="w-full h-full object-cover hidden filter-haru" />
-              <span id="strip-ph-0" class="absolute inset-0 flex items-center justify-center text-xs text-stone-400">Pose 1</span>
-            </div>
-            <div onclick="selectSlot(1)" class="w-full aspect-[4/3] bg-stone-100 rounded-sm overflow-hidden relative cursor-pointer border border-stone-200/50">
-              <img id="strip-img-1" class="w-full h-full object-cover hidden filter-haru" />
-              <span id="strip-ph-1" class="absolute inset-0 flex items-center justify-center text-xs text-stone-400">Pose 2</span>
-            </div>
-            <div onclick="selectSlot(2)" class="w-full aspect-[4/3] bg-stone-100 rounded-sm overflow-hidden relative cursor-pointer border border-stone-200/50">
-              <img id="strip-img-2" class="w-full h-full object-cover hidden filter-haru" />
-              <span id="strip-ph-2" class="absolute inset-0 flex items-center justify-center text-xs text-stone-400">Pose 3</span>
-            </div>
-            <div onclick="selectSlot(3)" class="w-full aspect-[4/3] bg-stone-100 rounded-sm overflow-hidden relative cursor-pointer border border-stone-200/50">
-              <img id="strip-img-3" class="w-full h-full object-cover hidden filter-haru" />
-              <span id="strip-ph-3" class="absolute inset-0 flex items-center justify-center text-xs text-stone-400">Pose 4</span>
-            </div>
-
-            <!-- Footer Strip Label -->
-            <div class="text-center pt-2 pb-1">
-              <p class="font-handwriting text-base font-bold text-stone-700 leading-tight">Together Always ♡</p>
-              <p id="strip-date-label" class="text-[9px] uppercase tracking-widest text-stone-400"></p>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="w-full mt-4 flex flex-col gap-2">
-            <button 
-              onclick="downloadPhotoStrip()" 
-              class="w-full py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-sm transition active:scale-95"
-            >
-              Download Strip (PNG)
-            </button>
-            <div class="flex gap-2">
-              <button onclick="setStripTheme('white')" class="flex-1 py-1 text-[11px] border border-stone-200 rounded-lg hover:bg-stone-50">White Strip</button>
-              <button onclick="setStripTheme('black')" class="flex-1 py-1 text-[11px] border border-stone-200 rounded-lg hover:bg-stone-50">Noir Strip</button>
-              <button onclick="setStripTheme('pink')" class="flex-1 py-1 text-[11px] border border-stone-200 rounded-lg hover:bg-stone-50">Pink Strip</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
     </div>
   </div>
-
-  <!-- ================= SECRET ADMIN EDITOR MODAL ================= -->
-  <div id="admin-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="p-4 border-b border-stone-100 flex items-center justify-between">
-        <h3 class="font-semibold text-stone-800 text-sm">Secret Clue & Story Editor</h3>
-        <button onclick="toggleAdminModal(false)" class="text-stone-400 hover:text-stone-700 text-sm">✕</button>
-      </div>
-      <div id="admin-cards-list" class="p-4 overflow-y-auto space-y-4 text-xs">
-        <!-- Rendered by JS -->
-      </div>
-      <div class="p-3 border-t border-stone-100 bg-stone-50 flex justify-end gap-2">
-        <button onclick="saveAdminChanges()" class="px-4 py-2 bg-rose-600 text-white rounded-lg text-xs font-semibold hover:bg-rose-700">Save Changes</button>
-      </div>
-    </div>
-  </div>
-
-  <canvas id="strip-canvas" class="hidden"></canvas>
 
   <script>
-    /* ========================================================
-       FLOATING BACKGROUND HEARTS GENERATOR
-       ======================================================== */
-    const heartSymbols = ['🌸', '💖', '✨', '💕', '🌷', '🤍', '💌'];
-    const heartsContainer = document.getElementById('hearts-bg-container');
+    let currentCard = 1;
+    let card1Solved = false;
+    let card2Solved = false;
+    let card3Solved = false;
+    let proposalRevealed = false;
+    let questionHasAppeared = false;
+    let proposalTimer = null;
 
-    function createFloatingHeart() {
-      if (!heartsContainer) return;
-      const heart = document.createElement('span');
-      heart.className = 'floating-heart';
-      heart.innerText = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
-      
-      const leftPos = Math.random() * 100;
-      const duration = 10 + Math.random() * 14;
-      const size = 16 + Math.random() * 20;
+    // Love notes for Placard 3 carousel
+    const loveNotes = [
+      "Butterfly cant see their own wings, but people still admire them. So when I say you’re perfect, I meant it even if you dont see it, I do",
+      "I dont just love her for the attention, for the love and care she gives me. I love her existence. I LOVE HER. I lover her on her angry days, on her silent days, on her bad days when she doesn’t want to talk but still reaches out to me.",
+      "her smile matter more to me than my own I just wish she knew I wish she really knew.",
+      "I just want to give you peace and nothing more",
+      "I like how people around us are getting to know what we are but still the dont know know what all we call each other, or how deep the convos go. I like that theres a part of my life- that only you know, and part of yours that only I know."
+    ];
+    let currentNoteIndex = 0;
 
-      heart.style.left = `${leftPos}vw`;
-      heart.style.fontSize = `${size}px`;
-      heart.style.animationDuration = `${duration}s`;
+    // Fallbacks
+    function showChatFallback() {
+      const img = document.getElementById('memory-image');
+      const fallback = document.getElementById('chat-mockup-fallback');
+      if (img && fallback) {
+        img.style.display = 'none';
+        fallback.classList.remove('hidden');
+      }
+    }
 
-      heartsContainer.appendChild(heart);
+    function showVideoFallback() {
+      const vid = document.getElementById('placard2-video');
+      const fallback = document.getElementById('video-mockup-fallback');
+      if (vid && fallback) {
+        vid.style.display = 'none';
+        fallback.classList.remove('hidden');
+        fallback.classList.add('flex');
+      }
+    }
+
+    function showPhotoFallback() {
+      const img = document.getElementById('photo-card-3');
+      const fallback = document.getElementById('photo-mockup-fallback');
+      if (img && fallback) {
+        img.style.display = 'none';
+        fallback.classList.remove('hidden');
+        fallback.classList.add('flex');
+      }
+    }
+
+    function showProposalVideoFallback() {
+      const vid = document.getElementById('proposal-video');
+      const fallback = document.getElementById('proposal-video-mockup-fallback');
+      if (vid && fallback) {
+        vid.style.display = 'none';
+        fallback.classList.remove('hidden');
+        fallback.classList.add('flex');
+      }
+    }
+
+    // Placard 1 validation
+    function handlePlacard1Submit(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById('input-card-1');
+      const feedbackEl = document.getElementById('feedback-card-1');
+      const cardEl = document.getElementById('placard-1');
+      const revealEl = document.getElementById('reveal-card-1');
+
+      const rawVal = inputEl.value.trim().toLowerCase();
+
+      const acceptedAnswers = [
+        'red',
+        'red string',
+        'the red',
+        'the red string',
+        'red string theory'
+      ];
+
+      if (acceptedAnswers.includes(rawVal)) {
+        card1Solved = true;
+        feedbackEl.textContent = "";
+        feedbackEl.classList.add('opacity-0');
+
+        inputEl.disabled = true;
+        inputEl.classList.add('bg-lilac-50', 'text-lilac-700', 'border-lilac-300');
+        
+        document.getElementById('btn-submit-1').style.display = 'none';
+
+        revealEl.classList.remove('hidden');
+        revealEl.classList.add('flex');
+
+      } else {
+        feedbackEl.textContent = "Close, try again 🌸";
+        feedbackEl.classList.remove('opacity-0');
+
+        cardEl.classList.remove('animate-shake');
+        void cardEl.offsetWidth;
+        cardEl.classList.add('animate-shake');
+        inputEl.focus();
+      }
+    }
+
+    // Placard 2 validation
+    function handlePlacard2Submit(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById('input-card-2');
+      const feedbackEl = document.getElementById('feedback-card-2');
+      const cardEl = document.getElementById('placard-2');
+      const revealEl = document.getElementById('reveal-card-2');
+
+      const rawVal = inputEl.value.trim().toLowerCase().replace(/['’]/g, '');
+
+      const acceptedAnswers = [
+        'lovers',
+        'lovers rock',
+        'lover',
+        'loversrock'
+      ];
+
+      if (acceptedAnswers.includes(rawVal)) {
+        card2Solved = true;
+        feedbackEl.textContent = "";
+        feedbackEl.classList.add('opacity-0');
+
+        inputEl.disabled = true;
+        inputEl.classList.add('bg-lilac-50', 'text-lilac-700', 'border-lilac-300');
+        
+        document.getElementById('btn-submit-2').style.display = 'none';
+
+        revealEl.classList.remove('hidden');
+        revealEl.classList.add('flex');
+
+        const videoEl = document.getElementById('placard2-video');
+        if (videoEl) {
+          videoEl.currentTime = 0;
+          const playPromise = videoEl.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {});
+          }
+        }
+
+      } else {
+        feedbackEl.textContent = "Close, think of the song 🌸";
+        feedbackEl.classList.remove('opacity-0');
+
+        cardEl.classList.remove('animate-shake');
+        void cardEl.offsetWidth;
+        cardEl.classList.add('animate-shake');
+        inputEl.focus();
+      }
+    }
+
+    // Placard 3 validation
+    function handlePlacard3Submit(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById('input-card-3');
+      const feedbackEl = document.getElementById('feedback-card-3');
+      const cardEl = document.getElementById('placard-3');
+      const revealEl = document.getElementById('reveal-card-3');
+
+      const rawVal = inputEl.value.trim().toLowerCase();
+
+      const acceptedAnswers = [
+        'wings',
+        'wing',
+        'her wings',
+        'their wings',
+        'its wings',
+        'own wings',
+        'the wings'
+      ];
+
+      if (acceptedAnswers.includes(rawVal)) {
+        card3Solved = true;
+        feedbackEl.textContent = "";
+        feedbackEl.classList.add('opacity-0');
+
+        inputEl.disabled = true;
+        inputEl.classList.add('bg-lilac-50', 'text-lilac-700', 'border-lilac-300');
+        
+        document.getElementById('btn-submit-3').style.display = 'none';
+
+        revealEl.classList.remove('hidden');
+        revealEl.classList.add('flex');
+
+        currentNoteIndex = 0;
+        renderCurrentNote();
+
+      } else {
+        feedbackEl.textContent = "Close, look at the butterfly 🦋";
+        feedbackEl.classList.remove('opacity-0');
+
+        cardEl.classList.remove('animate-shake');
+        void cardEl.offsetWidth;
+        cardEl.classList.add('animate-shake');
+        inputEl.focus();
+      }
+    }
+
+    // Render note inside Placard 3 stack
+    function renderCurrentNote() {
+      const contentEl = document.getElementById('notes-content');
+      const trackerEl = document.getElementById('note-tracker');
+      const prevBtn = document.getElementById('btn-note-prev');
+      const nextBtn = document.getElementById('btn-note-next');
+      const photoContainer = document.getElementById('note5-photo-container');
+
+      contentEl.style.opacity = '0';
+      contentEl.style.transform = 'translateY(6px)';
 
       setTimeout(() => {
-        heart.remove();
-      }, duration * 1000);
-    }
+        contentEl.textContent = loveNotes[currentNoteIndex];
+        trackerEl.textContent = `Note ${currentNoteIndex + 1} of ${loveNotes.length}`;
 
-    // Spawn initial pool and continue periodically
-    for (let i = 0; i < 14; i++) {
-      setTimeout(createFloatingHeart, i * 400);
-    }
-    setInterval(createFloatingHeart, 1600);
-
-    /* ========================================================
-       DATA STORE: CHAPTERS, CLUES & PROPOSAL
-       ======================================================== */
-    const defaultData = [
-      {
-        id: 1,
-        title: "Chapter I: Where It Began",
-        hint: "The cozy place where we first exchanged words that made the entire room disappear.",
-        answer: "coffee",
-        date: "October 14",
-        memory: "You smiled before you even said hello. From that very first conversation, I knew you were going to be someone unforgettable.",
-        isFinalProposal: false
-      },
-      {
-        id: 2,
-        title: "Chapter II: The Inside Joke",
-        hint: "What sweet treat did we order that ended up making us laugh so hard we couldn't finish it?",
-        answer: "gelato",
-        date: "December 02",
-        memory: "No one else gets us quite like this. In a crowd of thousands, you are always the one my eyes search for first.",
-        isFinalProposal: false
-      },
-      {
-        id: 3,
-        title: "Chapter III: The Question",
-        hint: "Type 'forever' to unfold the final secret parchment.",
-        answer: "forever",
-        date: "Today",
-        memory: "Every laugh, every quiet evening, and every memory has led straight to this exact moment right here.",
-        isFinalProposal: true
-      }
-    ];
-
-    let chapters = JSON.parse(localStorage.getItem('proposal_story_data')) || defaultData;
-    let unlockedCards = JSON.parse(localStorage.getItem('unlocked_cards')) || {};
-
-    /* ========================================================
-       RENDER SCROLLABLE PLACARDS
-       ======================================================== */
-    function renderPlacards() {
-      const container = document.getElementById('placards-container');
-      container.innerHTML = '';
-
-      chapters.forEach((item) => {
-        const isUnlocked = unlockedCards[item.id];
-        const cardEl = document.createElement('div');
-        cardEl.id = `card-wrapper-${item.id}`;
-        cardEl.className = "w-full transition-all duration-300";
-
-        if (!isUnlocked) {
-          // LOCKED STATE
-          cardEl.innerHTML = `
-            <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-rose-100 shadow-lg shadow-rose-100/60 relative">
-              <div class="flex items-center justify-between pb-4 border-b border-rose-100/80">
-                <span class="text-xs uppercase tracking-wider text-rose-500 font-bold flex items-center gap-1.5">
-                  <span>💌</span> ${item.title}
-                </span>
-                <span class="text-rose-400 text-xs font-medium bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">🔒 Riddle Locked</span>
-              </div>
-              
-              <div class="my-6">
-                <p class="text-[11px] text-stone-400 font-bold uppercase tracking-wider mb-1.5">Your Riddle</p>
-                <p class="text-stone-700 text-base sm:text-lg leading-relaxed italic">"${item.hint}"</p>
-              </div>
-
-              <div class="space-y-3 pt-2">
-                <div class="flex gap-2">
-                  <input 
-                    type="text" 
-                    id="input-${item.id}"
-                    placeholder="Enter the secret answer..."
-                    class="flex-1 bg-rose-50/50 border border-rose-200/80 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white transition"
-                    onkeydown="if(event.key === 'Enter') unlockCard(${item.id})"
-                  />
-                  <button 
-                    onclick="unlockCard(${item.id})"
-                    class="px-6 py-3 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-2xl text-sm font-semibold shadow-md shadow-rose-200 transition flex items-center gap-1"
-                  >
-                    <span>Unfold</span> ✨
-                  </button>
-                </div>
-                <p id="error-${item.id}" class="text-xs text-rose-500 hidden font-medium">Not quite! Think back to our memory...</p>
-              </div>
-            </div>
-          `;
+        if (currentNoteIndex === 4) {
+          photoContainer.classList.remove('hidden');
+          nextBtn.textContent = 'Read again 💌';
         } else {
-          // UNLOCKED STATE (CRUMPLED PARCHMENT UNFOLDED)
-          if (!item.isFinalProposal) {
-            cardEl.innerHTML = `
-              <div class="parchment rounded-3xl p-6 sm:p-8 border border-amber-900/15 relative animate-unfold shadow-xl">
-                <div class="flex items-center justify-between pb-3 border-b border-amber-900/10">
-                  <span class="font-serif italic text-amber-900 text-xs font-semibold flex items-center gap-1.5">
-                    <span>📜</span> ${item.title}
-                  </span>
-                  <span class="text-[11px] font-mono tracking-widest text-amber-800/70 uppercase bg-amber-100/60 px-2.5 py-0.5 rounded-full">${item.date}</span>
-                </div>
-                <div class="py-6 sm:py-8">
-                  <p class="font-handwriting text-2xl sm:text-3xl text-stone-800 leading-snug">
-                    "${item.memory}"
-                  </p>
-                </div>
-                <div class="pt-2 flex justify-end">
-                  <span class="text-xs text-rose-500 font-handwriting font-bold text-sm">Unfolded with love ♡</span>
-                </div>
-              </div>
-            `;
-          } else {
-            // PROPOSAL PLACARD WITH RUNAWAY NO TRAP
-            cardEl.innerHTML = `
-              <div class="parchment rounded-3xl p-6 sm:p-10 border-2 border-rose-300 relative animate-unfold shadow-2xl text-center">
-                <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-rose-50 flex items-center justify-center text-3xl shadow-inner border border-rose-100 gentle-pulse">
-                  💍
-                </div>
-                <h3 class="font-serif text-2xl sm:text-3xl font-bold text-stone-900 mb-2">
-                  Would you like to be my girlfriend?
-                </h3>
-                <p class="font-handwriting text-xl sm:text-2xl text-stone-700 max-w-md mx-auto mb-8 leading-snug">
-                  "${item.memory}"
-                </p>
-
-                <!-- Action Buttons -->
-                <div id="proposal-actions" class="relative min-h-[90px] flex items-center justify-center gap-4">
-                  <button 
-                    id="yes-btn"
-                    onclick="acceptProposal()"
-                    class="px-8 py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-bold text-base shadow-xl shadow-rose-300 active:scale-95 transition-all z-10"
-                  >
-                    YES! 💖
-                  </button>
-
-                  <button 
-                    id="no-btn"
-                    onmouseover="dodgeNoButton()"
-                    ontouchstart="dodgeNoButton()"
-                    class="px-6 py-3 bg-stone-200 text-stone-600 rounded-full font-semibold text-sm transition-all absolute duration-150"
-                  >
-                    No
-                  </button>
-                </div>
-
-                <p id="dodge-quote" class="text-xs text-rose-500 font-medium h-4 mt-3 transition-opacity opacity-0">
-                  Error: "No" is not an option 😉
-                </p>
-              </div>
-            `;
-          }
+          photoContainer.classList.add('hidden');
+          nextBtn.textContent = 'Next note 💌';
         }
 
-        container.appendChild(cardEl);
-      });
+        if (currentNoteIndex === 0) {
+          prevBtn.classList.add('opacity-40', 'cursor-not-allowed');
+          prevBtn.disabled = true;
+        } else {
+          prevBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+          prevBtn.disabled = false;
+        }
+
+        contentEl.style.opacity = '1';
+        contentEl.style.transform = 'translateY(0)';
+      }, 150);
     }
 
-    /* ========================================================
-       UNLOCK MECHANIC
-       ======================================================== */
-    function unlockCard(id) {
-      const chapter = chapters.find(c => c.id === id);
-      const input = document.getElementById(`input-${id}`);
-      const err = document.getElementById(`error-${id}`);
-      
-      if (!input || !chapter) return;
-
-      const userVal = input.value.trim().toLowerCase();
-      const trueVal = chapter.answer.trim().toLowerCase();
-
-      if (userVal === trueVal) {
-        unlockedCards[id] = true;
-        localStorage.setItem('unlocked_cards', JSON.stringify(unlockedCards));
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.6 }
-        });
-        renderPlacards();
+    function nextNote() {
+      if (currentNoteIndex < loveNotes.length - 1) {
+        currentNoteIndex++;
       } else {
-        err.classList.remove('hidden');
-        input.classList.add('border-rose-400');
+        currentNoteIndex = 0;
+      }
+      renderCurrentNote();
+    }
+
+    function prevNote() {
+      if (currentNoteIndex > 0) {
+        currentNoteIndex--;
+        renderCurrentNote();
       }
     }
 
-    /* ========================================================
-       RUNAWAY "NO" BUTTON TRAP
-       ======================================================== */
-    let dodgeCount = 0;
-    const teasingQuotes = [
-      "Error: 'No' is not an option 😉",
-      "Are you sure? Try again! 🌸",
-      "Nice try! Your heart says yes ✨",
-      "That button is broken, click YES! 💖"
-    ];
+    // ==============================================
+    // PLACARD 4: VIDEO REVEAL & 40-SECOND TIMING
+    // ==============================================
+    function revealProposalVideo() {
+      proposalRevealed = true;
+      const statementView = document.getElementById('placard-4-statement-view');
+      const videoView = document.getElementById('placard-4-video-view');
+      const videoEl = document.getElementById('proposal-video');
 
-    function dodgeNoButton() {
-      const noBtn = document.getElementById('no-btn');
-      const yesBtn = document.getElementById('yes-btn');
-      const quote = document.getElementById('dodge-quote');
-      if (!noBtn) return;
+      statementView.classList.add('hidden');
+      videoView.classList.remove('hidden');
+      videoView.classList.add('flex');
 
-      dodgeCount++;
+      if (videoEl) {
+        videoEl.currentTime = 0;
+        videoEl.muted = false; // direct user gesture permits unmuted playback
 
-      const randomX = (Math.random() - 0.5) * 220;
-      const randomY = (Math.random() - 0.5) * 120;
-
-      noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${Math.max(0.55, 1 - dodgeCount * 0.1)})`;
-      
-      if (yesBtn) {
-        yesBtn.style.transform = `scale(${1 + Math.min(dodgeCount * 0.08, 0.4)})`;
-      }
-
-      if (quote) {
-        quote.innerText = teasingQuotes[dodgeCount % teasingQuotes.length];
-        quote.classList.remove('opacity-0');
-      }
-    }
-
-    function acceptProposal() {
-      const end = Date.now() + 3.5 * 1000;
-      const colors = ['#f43f5e', '#ec4899', '#f59e0b', '#ffffff'];
-
-      (function frame() {
-        confetti({
-          particleCount: 4,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-          colors: colors
-        });
-        confetti({
-          particleCount: 4,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-          colors: colors
-        });
-
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      }());
-
-      const actions = document.getElementById('proposal-actions');
-      if (actions) {
-        actions.innerHTML = `
-          <div class="py-4 space-y-3">
-            <p class="font-serif text-2xl font-bold text-rose-600">SHE SAID YES! 🎉</p>
-            <button 
-              onclick="openPhotoboothModal()"
-              class="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition shadow-md shadow-rose-200"
-            >
-              📸 Capture Our First Photo Strip
-            </button>
-          </div>
-        `;
-      }
-    }
-
-    /* ========================================================
-       PHOTOBOOTH STUDIO
-       ======================================================== */
-    let currentFilter = 'filter-haru';
-    let currentStripTheme = 'white';
-    let selectedSlotIndex = 0;
-    let photoShots = [null, null, null, null];
-    let videoStream = null;
-
-    function openPhotoboothModal() {
-      const modal = document.getElementById('photobooth-modal');
-      modal.classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-
-      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      document.getElementById('strip-date-label').innerText = today;
-
-      initCamera();
-    }
-
-    function closePhotoboothModal() {
-      const modal = document.getElementById('photobooth-modal');
-      modal.classList.add('hidden');
-      document.body.style.overflow = 'auto';
-      stopCamera();
-    }
-
-    async function initCamera() {
-      try {
-        const video = document.getElementById('webcam-video');
-        videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 1280 }, height: { ideal: 960 }, facingMode: "user" },
-          audio: false
-        });
-        video.srcObject = videoStream;
-      } catch (err) {
-        console.warn("Camera access denied or unavailable", err);
-        document.getElementById('current-slot-badge').innerText = "Camera not detected";
-      }
-    }
-
-    function stopCamera() {
-      if (videoStream) {
-        videoStream.getTracks().forEach(t => t.stop());
-        videoStream = null;
-      }
-    }
-
-    function setPhotoboothFilter(filterName) {
-      currentFilter = filterName;
-      const video = document.getElementById('webcam-video');
-      video.className = `w-full h-full object-cover -scale-x-100 ${filterName}`;
-      
-      for (let i = 0; i < 4; i++) {
-        const img = document.getElementById(`strip-img-${i}`);
-        if (img) img.className = `w-full h-full object-cover ${filterName}`;
-      }
-    }
-
-    function setStripTheme(theme) {
-      currentStripTheme = theme;
-      const strip = document.getElementById('photobooth-strip');
-      if (theme === 'white') {
-        strip.style.backgroundColor = '#ffffff';
-        strip.style.color = '#292524';
-      } else if (theme === 'black') {
-        strip.style.backgroundColor = '#1c1917';
-        strip.style.color = '#fafaf9';
-      } else if (theme === 'pink') {
-        strip.style.backgroundColor = '#fdf2f8';
-        strip.style.color = '#831843';
-      }
-    }
-
-    function selectSlot(index) {
-      selectedSlotIndex = index;
-      document.getElementById('current-slot-badge').innerText = `Ready for Pose ${index + 1}`;
-    }
-
-    function triggerFlash() {
-      const flash = document.getElementById('camera-flash');
-      flash.classList.remove('flash-active');
-      void flash.offsetWidth;
-      flash.classList.add('flash-active');
-    }
-
-    function captureFrameToSlot(slotIndex) {
-      const video = document.getElementById('webcam-video');
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
-      const ctx = canvas.getContext('2d');
-
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-      photoShots[slotIndex] = dataUrl;
-
-      const img = document.getElementById(`strip-img-${slotIndex}`);
-      const placeholder = document.getElementById(`strip-ph-${slotIndex}`);
-      img.src = dataUrl;
-      img.classList.remove('hidden');
-      if (placeholder) placeholder.classList.add('hidden');
-      triggerFlash();
-    }
-
-    async function startPhotoboothSequence() {
-      const btn = document.getElementById('start-sequence-btn');
-      btn.disabled = true;
-
-      for (let i = 0; i < 4; i++) {
-        selectSlot(i);
-        await runCountdown(3);
-        captureFrameToSlot(i);
-        await new Promise(r => setTimeout(r, 800));
-      }
-
-      btn.disabled = false;
-      document.getElementById('current-slot-badge').innerText = "All 4 poses captured! ✨";
-    }
-
-    async function retakeCurrentSlot() {
-      await runCountdown(3);
-      captureFrameToSlot(selectedSlotIndex);
-    }
-
-    function runCountdown(seconds) {
-      return new Promise(resolve => {
-        const overlay = document.getElementById('countdown-overlay');
-        overlay.classList.remove('hidden');
-        let current = seconds;
-        overlay.innerText = current;
-
-        const interval = setInterval(() => {
-          current--;
-          if (current > 0) {
-            overlay.innerText = current;
-          } else {
-            clearInterval(interval);
-            overlay.classList.add('hidden');
-            resolve();
-          }
-        }, 1000);
-      });
-    }
-
-    function downloadPhotoStrip() {
-      const canvas = document.getElementById('strip-canvas');
-      const ctx = canvas.getContext('2d');
-
-      const width = 450;
-      const height = 1350;
-      canvas.width = width;
-      canvas.height = height;
-
-      ctx.fillStyle = currentStripTheme === 'black' ? '#1c1917' : (currentStripTheme === 'pink' ? '#fdf2f8' : '#ffffff');
-      ctx.fillRect(0, 0, width, height);
-
-      const frameWidth = 390;
-      const frameHeight = 260;
-      const leftMargin = 30;
-      const startTop = 30;
-      const spacing = 20;
-
-      let loadedImages = 0;
-
-      photoShots.forEach((shot, idx) => {
-        const yPos = startTop + idx * (frameHeight + spacing);
-
-        if (shot) {
-          const img = new Image();
-          img.onload = () => {
-            ctx.save();
-            if (currentFilter === 'filter-noir') {
-              ctx.filter = 'grayscale(100%) contrast(130%)';
-            } else if (currentFilter === 'filter-amber') {
-              ctx.filter = 'sepia(40%) contrast(110%)';
-            } else if (currentFilter === 'filter-rose') {
-              ctx.filter = 'saturate(130%) hue-rotate(-10deg)';
-            } else {
-              ctx.filter = 'contrast(105%) brightness(105%)';
+        const playPromise = videoEl.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // If browser strictly blocks unmuted autoplay, mute and prompt unmute banner
+            videoEl.muted = true;
+            videoEl.play();
+            const banner = document.getElementById('unmute-banner');
+            if (banner) {
+              banner.classList.remove('hidden');
+              banner.classList.add('flex');
             }
-
-            ctx.drawImage(img, leftMargin, yPos, frameWidth, frameHeight);
-            ctx.restore();
-
-            loadedImages++;
-            if (loadedImages === 4) finishStripExport(ctx, width, height);
-          };
-          img.src = shot;
-        } else {
-          ctx.fillStyle = '#f3f4f6';
-          ctx.fillRect(leftMargin, yPos, frameWidth, frameHeight);
-          loadedImages++;
-          if (loadedImages === 4) finishStripExport(ctx, width, height);
+          });
         }
-      });
-    }
 
-    function finishStripExport(ctx, width, height) {
-      ctx.fillStyle = currentStripTheme === 'black' ? '#ffffff' : '#333333';
-      ctx.textAlign = 'center';
-      ctx.font = 'bold 36px "Caveat", cursive';
-      ctx.fillText("Together Always ♡", width / 2, height - 120);
+        // Precise video time listener (fires repeatedly as video plays)
+        videoEl.ontimeupdate = function() {
+          if (!questionHasAppeared && videoEl.currentTime >= 40) {
+            triggerProposalQuestion();
+          }
+        };
 
-      ctx.fillStyle = currentStripTheme === 'black' ? '#a8a29e' : '#78716c';
-      ctx.font = '16px monospace';
-      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      ctx.fillText(today.toUpperCase(), width / 2, height - 85);
-
-      const link = document.createElement('a');
-      link.download = `our-photostrip-${Date.now()}.png`;
-      link.href = document.getElementById('strip-canvas').toDataURL('image/png');
-      link.click();
-    }
-
-    /* ========================================================
-       SECRET ADMIN MODAL (#admin or 5 taps on footer heart)
-       ======================================================== */
-    let heartTapCount = 0;
-    document.getElementById('admin-secret-heart').addEventListener('click', () => {
-      heartTapCount++;
-      if (heartTapCount >= 5) {
-        toggleAdminModal(true);
-        heartTapCount = 0;
+        // Fallback: in case of video loading pause or fallback mockup, ensure question still shows after 40s
+        if (!proposalTimer) {
+          proposalTimer = setTimeout(() => {
+            if (!questionHasAppeared) {
+              triggerProposalQuestion();
+            }
+          }, 40000);
+        }
       }
-    });
-
-    if (window.location.hash === '#admin') {
-      toggleAdminModal(true);
     }
 
-    function toggleAdminModal(show) {
-      const modal = document.getElementById('admin-modal');
-      if (show) {
-        populateAdminFields();
+    function ensureProposalAudio() {
+      const videoEl = document.getElementById('proposal-video');
+      const banner = document.getElementById('unmute-banner');
+      if (videoEl) {
+        videoEl.muted = false;
+      }
+      if (banner) {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function triggerProposalQuestion() {
+      questionHasAppeared = true;
+      const questionBox = document.getElementById('proposal-question-box');
+      const countdownHint = document.getElementById('countdown-hint');
+
+      if (countdownHint) {
+        countdownHint.style.display = 'none';
+      }
+
+      if (questionBox) {
+        questionBox.classList.remove('hidden');
+        questionBox.classList.add('flex');
+
+        // Scroll smoothly to question so it is in full view
+        questionBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function handleSheSaidYes() {
+      const modal = document.getElementById('yes-modal');
+      if (modal) {
         modal.classList.remove('hidden');
-      } else {
+        modal.classList.add('flex');
+      }
+
+      // Sparkle burst effect
+      burstHearts();
+    }
+
+    function closeYesModal() {
+      const modal = document.getElementById('yes-modal');
+      if (modal) {
         modal.classList.add('hidden');
+        modal.classList.remove('flex');
       }
     }
 
-    function populateAdminFields() {
-      const container = document.getElementById('admin-cards-list');
-      container.innerHTML = '';
+    function burstHearts() {
+      const symbols = ['💜', '💖', '✨', '🌸', '💍'];
+      for (let i = 0; i < 24; i++) {
+        const p = document.createElement('div');
+        p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        p.className = 'fixed pointer-events-none z-50 text-xl transition-all duration-1000 ease-out select-none';
+        p.style.left = `${50 + (Math.random() * 40 - 20)}%`;
+        p.style.top = `${50 + (Math.random() * 40 - 20)}%`;
+        p.style.opacity = '1';
+        document.body.appendChild(p);
 
-      chapters.forEach((item) => {
-        const div = document.createElement('div');
-        div.className = "border border-stone-200 rounded-lg p-3 bg-stone-50 space-y-2";
-        div.innerHTML = `
-          <p class="font-bold text-stone-700">${item.title}</p>
-          <div>
-            <label class="block text-stone-500 mb-0.5">Clue / Riddle:</label>
-            <input id="edit-hint-${item.id}" value="${item.hint}" class="w-full border rounded p-1.5" />
-          </div>
-          <div>
-            <label class="block text-stone-500 mb-0.5">Passcode (Answer):</label>
-            <input id="edit-answer-${item.id}" value="${item.answer}" class="w-full border rounded p-1.5" />
-          </div>
-          <div>
-            <label class="block text-stone-500 mb-0.5">Memory Note:</label>
-            <textarea id="edit-memory-${item.id}" class="w-full border rounded p-1.5" rows="2">${item.memory}</textarea>
-          </div>
-        `;
-        container.appendChild(div);
-      });
+        const deltaX = (Math.random() - 0.5) * 240;
+        const deltaY = -80 - Math.random() * 180;
+
+        setTimeout(() => {
+          p.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.4)`;
+          p.style.opacity = '0';
+        }, 20);
+
+        setTimeout(() => {
+          p.remove();
+        }, 1100);
+      }
     }
 
-    function saveAdminChanges() {
-      chapters.forEach(item => {
-        item.hint = document.getElementById(`edit-hint-${item.id}`).value;
-        item.answer = document.getElementById(`edit-answer-${item.id}`).value;
-        item.memory = document.getElementById(`edit-memory-${item.id}`).value;
-      });
+    // Bidirectional Navigation
+    function navigateToCard(targetId) {
+      if (targetId === currentCard) return;
 
-      localStorage.setItem('proposal_story_data', JSON.stringify(chapters));
-      toggleAdminModal(false);
-      renderPlacards();
+      const currentEl = document.getElementById(`placard-${currentCard}`);
+      const targetEl = document.getElementById(`placard-${targetId}`);
+      const counterEl = document.getElementById('step-counter');
+
+      if (!currentEl || !targetEl) return;
+
+      // Pause videos when navigating away
+      if (currentCard === 2) {
+        const vid = document.getElementById('placard2-video');
+        if (vid) vid.pause();
+      }
+      if (currentCard === 4) {
+        const vid = document.getElementById('proposal-video');
+        if (vid) vid.pause();
+      }
+
+      currentEl.style.opacity = '0';
+      currentEl.style.transform = targetId > currentCard ? 'scale(0.96) translateY(-20px)' : 'scale(0.96) translateY(20px)';
+
+      setTimeout(() => {
+        currentEl.style.display = 'none';
+        currentEl.classList.remove('placard-active');
+        currentEl.classList.add('placard-hidden');
+
+        targetEl.style.display = 'flex';
+        targetEl.classList.remove('placard-hidden');
+        void targetEl.offsetWidth;
+
+        targetEl.style.opacity = '1';
+        targetEl.style.transform = 'scale(1) translateY(0)';
+        targetEl.classList.add('placard-active');
+
+        currentCard = targetId;
+        counterEl.textContent = `Card ${targetId} of 4`;
+
+        // Resume video on returning to Placard 2
+        if (targetId === 2 && card2Solved) {
+          const vid = document.getElementById('placard2-video');
+          if (vid) vid.play().catch(() => {});
+        }
+
+        // Resume video on returning to Placard 4 if already revealed
+        if (targetId === 4 && proposalRevealed) {
+          const vid = document.getElementById('proposal-video');
+          if (vid) vid.play().catch(() => {});
+        }
+
+        // Auto-focus input fields
+        if (targetId === 2 && !card2Solved) {
+          const inp = document.getElementById('input-card-2');
+          if (inp) inp.focus();
+        } else if (targetId === 3 && !card3Solved) {
+          const inp = document.getElementById('input-card-3');
+          if (inp) inp.focus();
+        }
+      }, 250);
     }
 
-    // Initialize UI on load
-    renderPlacards();
+    // Ambient floating elements generator
+    function createAmbientFloatingElements() {
+      const container = document.getElementById('particle-field');
+      const symbols = ['✨', '🌸', '💜', '🧶', '🤍', '🦋'];
+      const total = 14;
+
+      for (let i = 0; i < total; i++) {
+        const item = document.createElement('div');
+        item.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        item.className = 'absolute text-xs select-none pointer-events-none';
+        
+        const startX = Math.random() * 100;
+        const startY = Math.random() * 100;
+        const size = 11 + Math.random() * 12;
+        const opacity = 0.25 + Math.random() * 0.35;
+        const duration = 14 + Math.random() * 16;
+        const delay = Math.random() * 6;
+
+        item.style.left = `${startX}%`;
+        item.style.top = `${startY}%`;
+        item.style.fontSize = `${size}px`;
+        item.style.opacity = opacity;
+        item.style.animation = `ambientFloat ${duration}s ease-in-out infinite alternate`;
+        item.style.animationDelay = `-${delay}s`;
+
+        container.appendChild(item);
+      }
+    }
+
+    const floatStyle = document.createElement('style');
+    floatStyle.textContent = `
+      @keyframes ambientFloat {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(10px, -20px) rotate(10deg); }
+        100% { transform: translate(-10px, -40px) rotate(-10deg); }
+      }
+    `;
+    document.head.appendChild(floatStyle);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      createAmbientFloatingElements();
+      const firstInput = document.getElementById('input-card-1');
+      if (firstInput) firstInput.focus();
+    });
   </script>
 </body>
 </html>
