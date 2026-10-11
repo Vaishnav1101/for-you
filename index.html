@@ -483,7 +483,7 @@ I cant kiss you by the end of this note :///
             type="button" 
             onclick="revealProposalVideo()"
             class="w-full mt-6 py-4 px-6 rounded-2xl bg-gradient-to-r from-lilac-500 via-purple-600 to-lilac-600 hover:from-lilac-600 hover:to-purple-700 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 group active:scale-[0.98]">
-            <span>hi</span>
+            <span>Hi</span>
             <span class="text-lg transition-transform group-hover:scale-125">💌</span>
           </button>
         </div>
@@ -528,7 +528,6 @@ I cant kiss you by the end of this note :///
           <div id="proposal-question-box" class="hidden flex-col items-center text-center w-full mt-4 pt-4 border-t border-lilac-200 animate-pop-in">
             
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100/90 border border-pink-200 text-pink-700 text-xs font-bold mb-2">
-              <span>💍</span>
               <span>One question left</span>
             </div>
 
@@ -540,19 +539,23 @@ I cant kiss you by the end of this note :///
               from the bottom of my heart 🌸
             </p>
 
-            <div class="w-full flex flex-col sm:flex-row gap-3">
+            <div id="proposal-actions-container" class="relative w-full min-h-[64px] flex items-center justify-center gap-3">
               <button 
                 type="button" 
+                id="btn-yes"
                 onclick="handleSheSaidYes()"
-                class="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-pink-400 via-lilac-500 to-purple-600 hover:from-pink-500 hover:to-purple-700 text-white font-bold text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
-                <span>Yes, forever! 🥺💖</span>
+                class="py-3 px-8 rounded-2xl bg-gradient-to-r from-lilac-500 via-purple-600 to-lilac-600 hover:from-lilac-600 hover:to-purple-700 text-white font-bold text-sm shadow-md transition-all duration-300 active:scale-95 flex items-center justify-center">
+                Yes
               </button>
 
               <button 
                 type="button" 
-                onclick="handleSheSaidYes()"
-                class="flex-1 py-3.5 px-4 rounded-2xl bg-white/90 hover:bg-lilac-100/80 border border-lilac-300 text-lilac-900 font-bold text-sm shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
-                <span>Yes (obviously) ✨</span>
+                id="btn-no"
+                onmouseenter="trollNoButton(event)"
+                ontouchstart="trollNoButton(event)"
+                onclick="trollNoButton(event)"
+                class="py-3 px-8 rounded-2xl bg-white/90 hover:bg-lilac-100/80 border border-lilac-300 text-lilac-800 font-bold text-sm shadow-sm transition-all duration-200 flex items-center justify-center select-none cursor-pointer">
+                No
               </button>
             </div>
           </div>
@@ -595,6 +598,55 @@ I cant kiss you by the end of this note :///
     let proposalRevealed = false;
     let questionHasAppeared = false;
     let proposalTimer = null;
+    let trollAttempts = 0;
+    let yesScale = 1;
+
+    // Troll logic for "No" button
+    const playfulNoTexts = [
+      "No",
+      "Are you sure?",
+      "Wait what?!",
+      "Wrong button hehe",
+      "Try again :P",
+      "Nice try 😜",
+      "Not allowed!",
+      "Nope 💜"
+    ];
+
+    function trollNoButton(e) {
+      if (e) {
+        e.preventDefault();
+      }
+      trollAttempts++;
+      const noBtn = document.getElementById('btn-no');
+      const yesBtn = document.getElementById('btn-yes');
+      const container = document.getElementById('proposal-actions-container');
+      if (!noBtn || !container) return;
+
+      // Expand "Yes" button slightly each time she tries to click "No"
+      yesScale = Math.min(yesScale + 0.12, 1.85);
+      if (yesBtn) {
+        yesBtn.style.transform = `scale(${yesScale})`;
+        yesBtn.style.zIndex = "20";
+      }
+
+      // Change text playfully
+      const textIndex = trollAttempts % playfulNoTexts.length;
+      noBtn.textContent = playfulNoTexts[textIndex];
+
+      // Teleport the "No" button to a random offset within bounds
+      const containerRect = container.getBoundingClientRect();
+      const maxX = Math.max(containerRect.width / 2 - 40, 70);
+      const maxY = 45;
+
+      const randomX = (Math.random() * 2 - 1) * maxX;
+      const randomY = (Math.random() * 2 - 1) * maxY;
+      const randomRot = (Math.random() - 0.5) * 35;
+
+      noBtn.style.position = 'relative';
+      noBtn.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRot}deg)`;
+      noBtn.style.transition = 'all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    }
 
     // Love notes for Placard 3 carousel
     const loveNotes = [
